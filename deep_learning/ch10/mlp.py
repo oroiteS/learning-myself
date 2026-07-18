@@ -1,0 +1,1 @@
+from ch09.data import get_fashion_mnist_labels, load_data_fashion_mnist
