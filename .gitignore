@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# AI / Coding Agent artifacts
+# Claude (Anthropic) — .claude/ folders, settings, projects
+.claude/
+.claude.json
+**/.claude/
+# Codex (OpenAI)
+.codex/
+**/.codex/
+# AGENTS.md files (multi-agent instructions)
+**/Agents.md
