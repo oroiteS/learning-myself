@@ -3,7 +3,6 @@ import os
 import matplotlib.pyplot as plt
 import torch
 from data import get_fashion_mnist_labels, load_data_fashion_mnist
-from numpy import mod
 
 
 class Accumulator:
@@ -158,7 +157,7 @@ def train_epoch(model, train_iter, loss, updater, lr=0.01):
     return metric[0] / metric[2], metric[1] / metric[2]
 
 
-def train(model, train_iter, test_iter, loss, num_epochs, lr):
+def train(model, train_iter, test_iter, loss, num_epochs, lr, updater):
     animator = Animator(
         xlabel='epoch',
         xlim=[1, num_epochs],
@@ -166,7 +165,7 @@ def train(model, train_iter, test_iter, loss, num_epochs, lr):
         legend=['train loss', 'train acc', 'test acc']
     )
     for epoch in range(num_epochs):
-        train_loss, train_acc = train_epoch(model, train_iter, loss, sgd, lr)
+        train_loss, train_acc = train_epoch(model, train_iter, loss, updater, lr)
         test_acc = evaluate_accuracy(model, test_iter)
         animator.add(epoch + 1, (train_loss, train_acc, test_acc))
     print(f'训练损失: {train_loss:.3f}, 训练精度: {train_acc:.3f}, 测试精度: {test_acc:.3f}')
@@ -208,7 +207,7 @@ def main():
     model = SoftmaxRegression(config['num_inputs'], config['num_outputs'])
 
     # 3. 训练（只传 model，不传 W 和 b）
-    train(model, train_iter, test_iter, cross_entropy, config['num_epochs'], config['lr'])
+    train(model, train_iter, test_iter, cross_entropy, config['num_epochs'], config['lr'], sgd)
 
     # 4. 预测
     predict(model, test_iter)

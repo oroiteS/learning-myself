@@ -4,17 +4,19 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
 from data import get_fashion_mnist_labels, load_data_fashion_mnist
 
 
-class SimpleSoftmaxRegression(nn.Module):
-    def __init__(self, num_input, num_output):
+class MLP(nn.Module):
+    def __init__(self, num_inputs, num_hidden, num_outputs):
         super().__init__()
-        self.linear = nn.Linear(num_input, num_output)
+        self.net = nn.Sequential(
+            nn.Flatten(), nn.Linear(num_inputs, num_hidden), nn.ReLU(),
+            nn.Linear(num_hidden, num_outputs)
+        )
 
     def forward(self, X):
-        return self.linear(X)
+        return self.net(X)
 
 
 def train(model, num_epochs, num_input, train_iter, test_iter, loss_fn, optimizer):
@@ -79,22 +81,24 @@ def predict(model, test_iter, n=6):
 
 def main():
     config = {
+        'batch_size': 256,
+        'dataloader_workers': 4,
         'num_inputs': 784,
         'num_outputs': 10,
-        'lr': 0.1,
-        'batch_size': 256,
-        'num_epochs': 10,
-        'dataloader_workers': 4,
+        'num_hiddens': 256,
+        'num_epoch': 10,
+        'lr': 0.1
     }
     script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    model = MLP(config['num_inputs'], config['num_hiddens'], config['num_outputs'])
+    loss = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=config['lr'])
+
     train_iter, test_iter = load_data_fashion_mnist(
         config['batch_size'], config['dataloader_workers'], script_dir
     )
-    model = SimpleSoftmaxRegression(config['num_inputs'], config['num_outputs'])
-    loss = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=config['lr'])
-
-    train(model, config['num_epochs'], config['num_inputs'], train_iter, test_iter, loss, optimizer)
+    train(model, config['num_epoch'], config['num_inputs'], train_iter, test_iter, loss, optimizer)
     predict(model, test_iter)
 
 
