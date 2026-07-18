@@ -227,3 +227,5 @@ __marimo__/
 **/.codex/
 # AGENTS.md files (multi-agent instructions)
 **/Agents.md
+# dataset
+**/data/**
